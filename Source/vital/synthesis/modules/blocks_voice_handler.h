@@ -32,6 +32,7 @@
  // #include "osc.h"
 #include "vital/synthesis/modules/oscillator_module.h"
 #include "model/module_manager.h"
+#include "model/id.h"
 
 namespace vital {
 class AudioRateEnvelope;
@@ -79,13 +80,19 @@ public:
   }
 
   void addBlock(std::shared_ptr<model::Block> block);
+  void removeBlock(Index index, std::shared_ptr<model::Block> block);
   void connectAll();
   void unplugAll();
   void addModulator(std::shared_ptr<model::Module> module);
+  void removeModulator(int index, std::string type, std::string name);
   void repositionBlock(Index from, Index to);
   std::shared_ptr<vital::Processor> findProcessorAbove(Index index);
+  void setAmplitudeEnvelope(std::shared_ptr<model::Module> adsr, std::shared_ptr<model::Module> target);
 
-  std::vector<std::shared_ptr<model::Module>> active_modulators_;
+  std::vector<std::shared_ptr<SynthModule>> active_modulators_;
+  std::map<std::string, std::shared_ptr<SynthModule>> active_modulators_map_;
+
+  std::map<std::string, std::shared_ptr<SynthModule>> active_processor_map_;
 private:
   void createNoteArticulation();
   void createOscillators();
@@ -96,6 +103,7 @@ private:
   void setupPolyModulationReadouts();
 
   std::shared_ptr<SynthModule> createProcessor(std::shared_ptr<model::Block> module);
+  std::shared_ptr<EnvelopeModule> createEnvelope(bool audio_rate = false);
 
   ModulationConnectionBank modulation_bank_;
   CircularQueue<ModulationConnectionProcessor*> enabled_modulation_processors_;
@@ -105,16 +113,22 @@ private:
   Output* midi_offset_output_;
   Processor* bent_midi_;
   Processor* current_midi_note_;
-  EnvelopeModule* amplitude_envelope_;
+  std::shared_ptr<EnvelopeModule> amplitude_envelope_;
+  std::shared_ptr<EnvelopeModule> default_amplitude_envelope_;
   Processor* amplitude_;
   Processor* pitch_wheel_;
   Processor* voice_sum_;
   VariableAdd* last_node_;
 
-  std::vector<std::vector<std::shared_ptr<Processor>>> processor_matrix_;
+  std::vector<std::vector<std::shared_ptr<SynthModule>>> processor_matrix_;
   std::vector<std::shared_ptr<OscillatorModule>> oscillators_;
-  std::vector<std::shared_ptr<LfoModule>> lfos_;
-  std::vector<std::shared_ptr<EnvelopeModule>> envelopes_;
+
+  std::vector<std::shared_ptr<SynthModule>> lfos_;
+  std::vector<std::shared_ptr<SynthModule>> envelopes_;
+
+  std::vector<std::shared_ptr<SynthModule>> lfo_pool_;
+  std::vector<std::shared_ptr<SynthModule>> envelope_pool_;
+
   std::vector<FilterModule*> filters_;
 
   FiltersModule* filters_module_;

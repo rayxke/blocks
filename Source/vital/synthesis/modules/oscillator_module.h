@@ -18,6 +18,7 @@
 
 #include "vital/synthesis/framework/synth_module.h"
 #include "vital/synthesis/producers/synth_oscillator.h"
+#include "vital/synthesis/modules/envelope_module.h"
 
 namespace vital {
 class Wavetable;
@@ -38,7 +39,7 @@ public:
     kNumOutputs
   };
 
-  OscillatorModule(std::string prefix = "");
+  OscillatorModule();
   virtual ~OscillatorModule() { }
 
   void process(int num_samples) override;
@@ -47,10 +48,13 @@ public:
 
   Wavetable* getWavetable() { return wavetable_.get(); }
   force_inline SynthOscillator* oscillator() { return oscillator_; }
+
   SynthOscillator::DistortionType getDistortionType() {
     int val = distortion_type_->value();
     return static_cast<SynthOscillator::DistortionType>(val);
   }
+
+  std::shared_ptr<EnvelopeModule> amplitude_envelope_;
 
   Value* on_;
 protected:

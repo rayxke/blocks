@@ -154,7 +154,7 @@ void SynthVoiceHandler::createModulators() {
   for (int i = 0; i < kNumLfos; ++i) {
     lfo_sources_[i].setLoop(false);
     lfo_sources_[i].initTriangle();
-    std::string prefix = std::string("lfo_") + std::to_string(i + 1);
+    std::string prefix = std::string("lfo");
     LfoModule* lfo = new LfoModule(prefix, &lfo_sources_[i], beats_per_second_);
     addSubmodule(lfo);
     addProcessor(lfo);
@@ -170,16 +170,17 @@ void SynthVoiceHandler::createModulators() {
   }
 
   for (int i = 0; i < kNumEnvelopes; ++i) {
-    std::string prefix = std::string("env_") + std::to_string(i + 1);
-    EnvelopeModule* envelope = new EnvelopeModule(prefix, i == 0);
-    envelope->plug(retrigger(), EnvelopeModule::kTrigger);
-    addSubmodule(envelope);
-    addProcessor(envelope);
-    envelopes_[i] = envelope;
+    
+    // std::string prefix = std::string("env_") + std::to_string(i + 1);
+    // EnvelopeModule* envelope = new EnvelopeModule(prefix, i == 0);
+    // envelope->plug(retrigger(), EnvelopeModule::kTrigger);
+    // addSubmodule(envelope);
+    // addProcessor(envelope);
+    // envelopes_[i] = envelope;
 
-    data_->mod_sources[prefix] = envelope->output();
-    createStatusOutput(prefix, envelope->output(EnvelopeModule::kValue));
-    createStatusOutput(prefix + "_phase", envelope->output(EnvelopeModule::kPhase));
+    // data_->mod_sources[prefix] = envelope->output();
+    // createStatusOutput(prefix, envelope->output(EnvelopeModule::kValue));
+    // createStatusOutput(prefix + "_phase", envelope->output(EnvelopeModule::kPhase));
   }
 
   random_ = new TriggerRandom();

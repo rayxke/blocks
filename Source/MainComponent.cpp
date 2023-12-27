@@ -27,10 +27,18 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
-  auto osc_block = addBlock(0, { 0, 0 });
-  spawnBlockComponent(osc_block);
-  auto reverb_block = addBlock(6, { 1, 0 });
-  spawnBlockComponent(reverb_block);
+  // auto osc_block = addBlock(0, { 0, 0 });
+  // spawnBlockComponent(osc_block);
+
+  // auto osc_block_2 = addBlock(0, { 0, 1 });
+  // spawnBlockComponent(osc_block_2);
+
+  // auto f = addBlock(5, { 1, 0 });
+  // spawnBlockComponent(f);
+
+  // addModulator(Model::Types::lfo);
+  ui_layer_.modulators_.setVisible(true);
+  // delegate->editorConnectedModulation(0, "osc_1", "tune");
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -324,7 +332,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
 
     const float code_wavetable_frame = 
       code / 4.0 * (vital::kNumOscillatorWaveFrames - 1);
-    block->parameters_[0]->val->set(code_wavetable_frame);
+    block->parameter_map_["wave"]->val->set(code_wavetable_frame);
 
     // if (block == nullptr) return nullptr; // todo - grey out the button in the block selection popup if the block is not available
     // auto range = block->parameters[0]->audioParameter->getNormalisableRange();
@@ -334,7 +342,7 @@ std::shared_ptr<model::Block> MainComponent::addBlock(int code, Index index) {
   // case 4: // noise 
   case 5: block = delegate->editorAddedBlock2(Model::Types::filter, index); break;
     // case 5: block = delegate->editorAddedBlock(Model::Types::filter, index); break;
-    case 6: block = delegate->editorAddedBlock2(Model::Types::reverb, index); break;
+  case 6: block = delegate->editorAddedBlock2(Model::Types::reverb, index); break;
     // case 7: block = delegate->editorAddedBlock(Model::Types::delay, index); break;
     // case 8: block = delegate->editorAddedBlock(Model::Types::drive, index); break;
     // case 9: block = delegate->editorAddedBlock(Model::Types::mixer, index); break;
@@ -394,7 +402,7 @@ void MainComponent::removeBlock(GridItemComponent* block) {
 
   delegate->editorRemovedBlock(index);
   ui_layer_.setConnections(delegate->getModulations());
-  ResetDownFlowingDots();
+  // resetDownFlowingDots();
 }
 
 void MainComponent::handleModuleLandedOnInspector(BlockComponent* moduleComponent, const Point<int>& inspectorRelativePosition) {
@@ -549,7 +557,7 @@ void MainComponent::clear() {
   ui_layer_.preset_button_.label.setText("empty", dontSendNotification);
   ui_layer_.setConnections(delegate->getModulations());
   ui_layer_.setModulators(delegate->getModulators2());
-  ResetDownFlowingDots();
+  resetDownFlowingDots();
 }
 
 void MainComponent::modulationConnectionBipolarPressed(ConnectionComponent* component, bool bipolar) {
@@ -587,7 +595,7 @@ void MainComponent::connectionDeleted(ConnectionComponent* component) {
   ui_layer_.setConnections(delegate->getModulations());
 
   if (inspector_.isVisible()) inspector_.setConfiguration(delegate->getBlock2(focused_grid_item_->index));
-  for (auto block : blocks) block->setConfig(delegate->getBlock(block->index));
+  for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index));
 }
 
 void MainComponent::sliderValueChanged(Slider* slider) {
@@ -730,7 +738,7 @@ void MainComponent::modulatorRemoved(ModulatorComponent* component) {
   ui_layer_.setConnections(delegate->getModulations());
 
   // if (inspector.isVisible()) inspector.setConfiguration(delegate->getBlock(focusedGridItem->index));
-  for (auto block : blocks) block->setConfig(delegate->getBlock(block->index));
+  for (auto block : blocks) block->setConfig(delegate->getBlock2(block->index));
 }
 
 void MainComponent::setupPopupMenus() {
@@ -859,10 +867,10 @@ void MainComponent::notesStarted(Array<int> notes) {
 
 void MainComponent::notesEnded(Array<int> notes) { }
 
-void MainComponent::ResetDownFlowingDots() {
+void MainComponent::resetDownFlowingDots() {
   std::set<int> columns_with_blocks;
   for (auto block_component : blocks) {
-    auto block_model = delegate->getBlock(block_component->index);
+    auto block_model = delegate->getBlock2(block_component->index);
     if (block_model->id.type != Model::Types::osc) continue;
     columns_with_blocks.insert(block_component->index.column);
   }

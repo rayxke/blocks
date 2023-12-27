@@ -263,7 +263,7 @@ void PluginProcessor::editorAdjustedModulator(int parameter, int index, float va
 }
 
 void PluginProcessor::editorAdjustedBlock(Index index, int parameter, float value) {
-  DBG("value: " << value);
+  // DBG("value: " << value);
   auto block = synth_->getModuleManager().getBlock(index);
   auto param = block->parameters_[parameter]->val;
   param->set(value);
@@ -351,6 +351,9 @@ void PluginProcessor::editorConnectedModulation(int modulatorIndex, std::string 
 }
 
 void PluginProcessor::editorDisconnectedModulation(int index) {
+  auto connection = synth_->getModuleManager().getConnection(index);
+  synth_->disconnectModulation(connection->vital_connection_);
+  synth_->getModuleManager().removeConnection(index);
   // Analytics::shared()->countAction("Modulation Disconnected");
   // disconnect(index);
 }
@@ -375,8 +378,17 @@ std::shared_ptr<Tab> PluginProcessor::editorAddedTab(int column) {
 }
 
 void PluginProcessor::editorRemovedModulator(int index) {
-  // Analytics::shared()->countAction("Modulator Removed");
-  // removeModulator(index);
+  auto modulator = synth_->getModuleManager().getModulator(index);
+
+  getModuleManager().removeModulator(index);
+
+  auto module_connections = synth_->getModuleManager().getConnectionsOfSource(modulator);
+  for (auto connection : module_connections) {
+    synth_->disconnectModulation(connection->vital_connection_);
+    synth_->getModuleManager().removeConnection(connection);
+  }
+
+  getVoiceHandler()->removeModulator(index, modulator->id.type, modulator->name);
 }
 
 #pragma warning(default:4716)
@@ -390,7 +402,22 @@ std::shared_ptr<model::Module> PluginProcessor::editorAddedModulator2(Model::Typ
 
 void PluginProcessor::editorRemovedBlock(Index index) {
   // Analytics::shared()->countAction("Block Removed");
-  // removeBlock(index);
+  auto block = synth_->getModuleManager().getBlock(index);
+
+  for (auto connection : synth_->getModuleManager().getConnectionsOfSource(block)) {
+    synth_->disconnectModulation(connection->vital_connection_);
+    synth_->getModuleManager().removeConnection(connection);
+  }
+
+  getVoiceHandler()->removeBlock(index, block);
+  synth_->getModuleManager().removeBlock(block);  
+
+  // for (auto* voice : blockVoices)
+  //   for (int i = 0; i < block->length; i++)
+  //     voice->removeBlock(block->index.toTheRight(i));
+
+  // removeConnectionsFromTarget(block);
+  // moduleManager.removeBlock(block);
 }
 
 std::shared_ptr<Block> PluginProcessor::editorAddedBlock(Model::Type type, Index index) {

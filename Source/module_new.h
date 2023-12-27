@@ -24,7 +24,7 @@ public:
   int length = 1;
 
   inline bool isModulator() { return category == Category::modulator; }
-  inline bool isEnvelope() { return id.type == "adsr"; }
+  inline bool isEnvelope() { return id.type == "envelope"; }
   inline bool isOscillator() { return id.type == "osc"; }
 
   Module(std::string prefix, int number): name(prefix + "_" + std::to_string(number)) {
@@ -35,7 +35,7 @@ public:
   void add(vital::ValueDetails parameter) {
     parameter.display_name = parameter.display_name != "" ? parameter.display_name : parameter.name;
     std::string short_name = parameter.name;
-    parameter.name = name + "_" + parameter.name;
+    parameter.name = short_name;//name + "_" + parameter.name;
     auto shared_ptr = std::make_shared<vital::ValueDetails>(parameter);
     parameters_.push_back(shared_ptr);
     parameter_map_[short_name] = shared_ptr;

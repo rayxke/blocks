@@ -20,10 +20,10 @@ ModulePool::~ModulePool() { }
 
 // std::shared_ptr<Tab> ModulePool::getTab(Type type, int number) { return tabs.get({ type, number }); }
 std::shared_ptr<Block> ModulePool::getBlock(std::string type, int number = -1) { return blocks.get({ type, number }); }
-void ModulePool::Retire(std::shared_ptr<Block> block) { blocks.retire(block); }
+void ModulePool::retire(std::shared_ptr<Block> block) { blocks.retire(block); }
 // void ModulePool::Retire(std::shared_ptr<Tab> tab) { tabs.retire(tab); }
 
-void ModulePool::Retire(std::shared_ptr<Module> modulator) {
+void ModulePool::retire(std::shared_ptr<Module> modulator) {
   colourPool.retire(modulator->colour.id);
   modulators.retire(modulator);
 }
@@ -33,7 +33,7 @@ ModulePool::ModulePool() {
   blocks.spawn({ "filter" }, [](std::string type, int number) { return std::make_shared<model::FilterModule>(number); });
   blocks.spawn({ "reverb" }, [](std::string type, int number) { return std::make_shared<model::ReverbModule>(number); });
   modulators.spawn({ "lfo" }, [](std::string type, int number) { return std::make_shared<model::LFOModule>(number); });
-  modulators.spawn({ "adsr" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
+  modulators.spawn({ "envelope" }, [](std::string type, int number) { return std::make_shared<model::ADSRModule>(number); });
 
   for (int i = 1; i <= 40; i++) connections.push_back(std::make_shared<Connection>(i));
 
@@ -42,7 +42,7 @@ ModulePool::ModulePool() {
   // allModules.insert(allModules.end(), tabs.all.begin(), tabs.all.end());
 }
 
-void ModulePool::Retire(std::shared_ptr<model::Connection> modulationConnection) {
+void ModulePool::retire(std::shared_ptr<model::Connection> modulationConnection) {
   modulationConnection->reset();
   connections.push_back(modulationConnection);
 }

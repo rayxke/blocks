@@ -22,7 +22,7 @@ void ModuleManager::removeBlock(std::shared_ptr<model::Block> block) {
   nameToModuleMap.erase(block->name);
   blockMatrix[block->index.row][block->index.column] = nullptr;
   blocks.erase(std::remove(blocks.begin(), blocks.end(), block), blocks.end());
-  pool.Retire(block);
+  pool.retire(block);
 }
 
 std::shared_ptr<Module> ModuleManager::addModulator(std::string code, int number, int colourId) {
@@ -53,14 +53,14 @@ std::vector<std::shared_ptr<Connection>> ModuleManager::getConnectionsOfTarget(s
   return targetConnections;
 }
 
-void ModuleManager::RemoveModulator(int index) {
+void ModuleManager::removeModulator(int index) {
   auto modulator = modulators[index];
   modulators.erase(modulators.begin() + index);
 
   for (auto connection : getConnectionsOfSource(modulator))
     removeConnection(connection);
 
-  pool.Retire(modulator);
+  pool.retire(modulator);
   nameToModuleMap.erase(modulator->name);
 }
 
@@ -100,12 +100,15 @@ void ModuleManager::removeConnection(int index) {
   auto connection = connections[index];
   // connection->target->removeConnection(connection);
   connections.erase(connections.begin() + index);
-  pool.Retire(connection);
+  pool.retire(connection);
 }
 
 void ModuleManager::removeConnection(std::shared_ptr<Connection> connection) {
-  // connection->target->removeConnection(connection);
-  // pool.retire(connections.removeAndReturn(connections.indexOf(connection)));
+  auto it = std::find(connections.begin(), connections.end(), connection);
+  auto index = std::distance(connections.begin(), it);
+  auto connectionToRemove = connections[index];
+  connections.erase(connections.begin() + index);
+  pool.retire(connectionToRemove);
 }
 
 std::vector<std::shared_ptr<Connection>> ModuleManager::getConnections() {
@@ -120,7 +123,7 @@ void ModuleManager::clear() {
   // for (int i = tabs.size() - 1; i >= 0; i--) removeTab(tabs[i]);
   for (int i = blocks.size() - 1; i >= 0; i--) removeBlock(blocks[i]);
   for (int i = connections.size() - 1; i >= 0; i--) removeConnection(i);
-  for (int i = modulators.size() - 1; i >= 0; i--) RemoveModulator(i);
+  for (int i = modulators.size() - 1; i >= 0; i--) removeModulator(i);
 }
 
 // void ModuleManager::removeTab(std::shared_ptr<Tab> tab) {

@@ -119,8 +119,9 @@ void SynthBase::valueChangedExternal(const std::string& name, vital::mono_float 
 
 vital::ModulationConnection* SynthBase::getConnection(const std::string& source, const std::string& destination) {
   for (vital::ModulationConnection* connection : mod_connections_) {
-    if (connection->source_name == source && connection->destination_name == destination)
+    if (connection->source_name == source && connection->destination_name == destination) {
       return connection;
+    }
   }
   return nullptr;
 }
@@ -137,16 +138,21 @@ int SynthBase::getConnectionIndex(const std::string& source, const std::string& 
 
 vital::modulation_change SynthBase::createModulationChange(vital::ModulationConnection* connection) {
   vital::modulation_change change;
-  change.source = engine_->getModulationSource(connection->source_name);
-  change.mono_destination = engine_->getMonoModulationDestination(connection->destination_name);
-  change.mono_modulation_switch = engine_->getMonoModulationSwitch(connection->destination_name);
+  auto source = getVoiceHandler()->active_modulators_map_[connection->source_name];
+  auto target_processor = getVoiceHandler()->active_processor_map_[connection->destination_name];
+
+  change.source = source->output();
+  change.mono_destination = target_processor->getMonoModulationDestination(connection->parameter_name);
+  change.mono_modulation_switch = target_processor->getMonoModulationSwitch(connection->parameter_name);
+
   VITAL_ASSERT(change.source != nullptr);
   VITAL_ASSERT(change.mono_destination != nullptr);
   VITAL_ASSERT(change.mono_modulation_switch != nullptr);
 
-  change.destination_scale = vital::Parameters::getParameterRange(connection->destination_name);
-  change.poly_modulation_switch = engine_->getPolyModulationSwitch(connection->destination_name);
-  change.poly_destination = engine_->getPolyModulationDestination(connection->destination_name);
+  change.destination_scale = connection->destination_scale;
+  // change.poly_modulation_switch = engine_->getPolyModulationSwitch(connection->destination_name);
+  change.poly_modulation_switch = target_processor->getPolyModulationSwitch(connection->parameter_name);
+  change.poly_destination = target_processor->getPolyModulationDestination(connection->parameter_name); //engine_->getPolyModulationDestination(connection->destination_name);
   change.modulation_processor = connection->modulation_processor.get();
 
   int num_audio_rate = 0;
@@ -213,6 +219,7 @@ void SynthBase::disconnectModulation(vital::ModulationConnection* connection) {
   vital::modulation_change change = createModulationChange(connection);
   connection->source_name = "";
   connection->destination_name = "";
+  connection->parameter_name = "";
 
   mod_connections_.remove(connection);
   change.disconnecting = true;
@@ -784,24 +791,37 @@ void SynthBase::ValueChangedCallback::messageCallback() {
 }
 
 void SynthBase::connectModulation(int modulator_index, std::string target_name, std::string parameter_name) {
-  std::cout << "mod index: " << modulator_index << " param name: " << parameter_name << std::endl;
   auto target = module_manager_.getModule(target_name);
   auto source = module_manager_.getModulator(modulator_index);
   auto connection_module = module_manager_.addConnection(source, target, parameter_name);
-  std::cout << "connection: " << connection_module->id << std::endl;
+
   auto connection_name = "modulation_" + std::to_string(connection_module->number) + "_amount";
-  getControls()[connection_name]->set(1.0f);
+
+  bool addingADSRtoOSCLevel = source->id.type == "envelope" && target->id.type == "osc" && parameter_name == "level";
+  if (addingADSRtoOSCLevel) {
+    getVoiceHandler()->setAmplitudeEnvelope(source, target);
+    return;
+  }
 
   std::string modulator_name = getModuleManager().getModulator(modulator_index)->name;
 
   vital::ModulationConnection* connection = getConnection(modulator_name, parameter_name);
 
   bool create = connection == nullptr;
-  if (create) connection = getModulationBank().createConnection(modulator_name, parameter_name);
+  if (create) {
+    auto adjusted_name = target_name;// + "_" + parameter_name; 
+    connection = getModulationBank().createConnection(modulator_name, adjusted_name);
+  }
 
   if (connection) {
     connection_module->magnitude_parameter_->val = connection->modulation_processor->control_map_["amount"];
+    connection_module->magnitude_parameter_->val->set(1.0f);
     connection_module->bipolar_parameter_->val = connection->modulation_processor->control_map_["bipolar"];
+    // connection_module->
+    auto parameter = target->parameter_map_[parameter_name];
+    connection->destination_scale = parameter->max - parameter->min;
+    connection->parameter_name = parameter_name;
+    connection_module->vital_connection_ = connection;
     connectModulation(connection);
   }
 }

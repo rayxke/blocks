@@ -27,6 +27,19 @@ namespace vital {
 class ValueSwitch;
 class SynthModule;
 
+struct AddControlInput { 
+  std::string name;
+  bool audio_rate = false;
+  bool smooth_value = false;
+  Output* internal_modulation;
+  Input* reset;
+  mono_float post_offset = 0.0f;
+  ValueScale value_scale = ValueScale::kLinear;
+  mono_float min = 0.0f;
+  mono_float max = 1.0f;
+  mono_float default_value = 0.0f;
+};
+
 class StatusOutput {
 public:
   static constexpr float kClearValue = INT_MIN;
@@ -107,7 +120,7 @@ public:
 
   virtual Processor* clone() const override { return new SynthModule(*this); }
   void addSubmodule(SynthModule* module) { data_->sub_modules.push_back(module); }
-  virtual void setModule(model::Module module) {};
+  virtual void setModule(std::shared_ptr<model::Module> module) {};
   std::map<std::string, Value*> control_map_;
 
 protected:
@@ -123,6 +136,11 @@ protected:
   Output* createTempoSyncSwitch(std::string name, Processor* frequency, const Output* beats_per_second, bool poly, Input* midi = nullptr);
 
   void createStatusOutput(std::string name, Output* source);
+
+  Value* createBaseControl2(AddControlInput input);
+  Output* createBaseModControl2(AddControlInput input);
+  Output* createMonoModControl2(AddControlInput input);
+  Output* createPolyModControl2(AddControlInput input);
 
   std::shared_ptr<ModuleData> data_;
 
