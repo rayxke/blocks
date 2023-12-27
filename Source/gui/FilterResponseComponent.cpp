@@ -13,12 +13,12 @@ void FilterResponseComponent::resized() {}
 void FilterResponseComponent::paint(juce::Graphics& g) {
   int componentCenterY = getHeight() / 2;
 
-  for (int i = 0; i < unison; i++) {
+  for (int i = 0; i < 4; i++) {
       float xOffset = i * 3.0f;
       float yOffset = i * 1.5f;
 
       for (float x = xOffset; x < getWidth(); x += resolution) {
-      float y = getWaveform(x + offset);
+      float y = x + offset;
       float halfHeight = getHeight() / 2.0f - thickness;
       float mappedY = jmap(y, -1.0f, 1.0f, componentCenterY - halfHeight, componentCenterY + halfHeight);
 
@@ -32,10 +32,10 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
   }  
 }
 
-  for (int i = unison - 1; i >= 0; i--) {
-    float alpha = std::lerp(1.0f, 0.01f, i / float(unison));
+  for (int i = 4 - 1; i >= 0; i--) {
+    float alpha = std::lerp(1.0f, 0.01f, i / float(4));
 
-    g.setColour(waveColour.withAlpha(alpha));
+    g.setColour(responseColour.withAlpha(alpha));
     g.strokePath(paths[i], PathStrokeType(thickness));
     paths[i].clear();
   }

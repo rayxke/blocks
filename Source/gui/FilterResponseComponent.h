@@ -20,7 +20,7 @@ public:
   float resonance = 3.0f;
 private:
   float resolution = 0.5f;
-  Path path;
+  Path paths[4];
   float offset = 0;
 
   void update(const float secondsSinceLastUpdate) override;
