@@ -25,6 +25,7 @@ OscillatorModule::OscillatorModule():
   SynthModule(kNumInputs, kNumOutputs), prefix_(std::move("osc")), on_(nullptr), distortion_type_(nullptr) {
   wavetable_ = std::make_shared<Wavetable>(kNumOscillatorWaveFrames);
   was_on_ = std::make_shared<bool>(true);
+  default_envelope_module_ = std::make_shared<model::ADSRModule>(0);
 }
 
 void OscillatorModule::init() {
@@ -40,14 +41,14 @@ void OscillatorModule::init() {
 
   Input* reset = input(kReset);
 
-  Output* wave_frame = createPolyModControl2({ .name = "wave_frame", .max = 256 });
+  Output* wave_frame = createPolyModControl2({ .name = "wave_frame", .max = 3.0, .value_scale = ValueScale::kIndexed });
   Output* transpose = createPolyModControl2({ .name = "transpose", .audio_rate = true, .reset = reset, .min = -48, .max = 48, .value_scale = ValueScale::kIndexed });
   Output* tune = createPolyModControl2({ .name = "tune", .audio_rate = true, .reset = reset, .max = 1.0 });
   Output* unison_voices = createPolyModControl2({ .name = "unison_voices", .min = 1.0, .max = 16.0, .value_scale = ValueScale::kIndexed, .default_value = 1.0 });
   Output* unison_detune = createPolyModControl2({ .name = "unison_detune", .value_scale = ValueScale::kQuadratic, .default_value = 4.472135955 });
   Output* detune_power = createPolyModControl2({ .name = "detune_power" });
   Output* detune_range = createPolyModControl2({ .name = "detune_range", .max = 48, .default_value = 2.0 });
-  Output* amplitude = createPolyModControl2({ .name = "amplitude", .audio_rate = true, .smooth_value = true, .reset = reset });
+  Output* amplitude = createPolyModControl2({ .name = "amplitude", .audio_rate = true, .smooth_value = true, .reset = reset, .default_value = 0.70710678119 });
   Output* pan = createPolyModControl2({ .name = "pan", .min = -1.0 });
   Output* phase = createPolyModControl2({ .name = "phase", .audio_rate = true, .smooth_value = true, .reset = reset, .default_value = 0.5 });
   Output* distortion_phase = createPolyModControl2({ .name = "distortion_phase", .default_value = 0.5 });
@@ -98,12 +99,12 @@ void OscillatorModule::init() {
   amplitude_envelope_ = std::make_shared<EnvelopeModule>(true);
   addProcessor(amplitude_envelope_.get());
 
-  auto multiply = new Multiply();
-  addProcessor(multiply);
-  multiply->plug(amplitude_envelope_->output(), 0);
-  multiply->plug(oscillator_, 1);
+  addProcessor(env_multiply_);
 
-  multiply->useOutput(output(kRaw), 0);
+  env_multiply_->plug(amplitude_envelope_->output(), 0);
+  env_multiply_->plug(oscillator_, 1);
+  env_multiply_->useOutput(output(kRaw), 0);
+
   amplitude_envelope_.get()->plug(input(kRetrigger)->source, EnvelopeModule::kTrigger);
 
   SynthModule::init();

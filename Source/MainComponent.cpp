@@ -27,18 +27,18 @@ MainComponent::MainComponent(juce::MidiKeyboardState& keyboard_state, Delegate* 
   note_logger_.listener = this;
   ThemeManager::shared()->set(UserSettings::shared()->getInt("theme", 0));
 
-  // auto osc_block = addBlock(0, { 0, 0 });
-  // spawnBlockComponent(osc_block);
+  auto osc_block = addBlock(0, { 0, 0 });
+  spawnBlockComponent(osc_block);
 
   // auto osc_block_2 = addBlock(0, { 0, 1 });
   // spawnBlockComponent(osc_block_2);
 
-  // auto f = addBlock(5, { 1, 0 });
-  // spawnBlockComponent(f);
+  auto f = addBlock(5, { 1, 0 });
+  spawnBlockComponent(f);
 
-  // addModulator(Model::Types::lfo);
-  ui_layer_.modulators_.setVisible(true);
-  // delegate->editorConnectedModulation(0, "osc_1", "tune");
+  // addModulator(Model::Types::adsr);
+  // ui_layer_.modulators_.setVisible(true);
+  // delegate->editorConnectedModulation(0, "osc_1", "level");
 }
 
 void MainComponent::updateDotPosition(const Point<int> position) {
@@ -75,8 +75,8 @@ void MainComponent::inspectorGestureChanged(int index, bool started) {
 }
 
 void MainComponent::changeModulePainter(int value) {
-  auto castedBlock = static_cast<BlockComponent*>(focused_grid_item_);
-  castedBlock->getPainter()->setWaveformType(static_cast<OscillatorPainter::WaveformType>(value));
+  auto cast_block = static_cast<BlockComponent*>(focused_grid_item_);
+  cast_block->getPainter()->setWaveformType(static_cast<OscillatorPainter::WaveformType>(value));
 }
 
 MainComponent::~MainComponent() {
@@ -166,7 +166,6 @@ void MainComponent::setupListeners() {
   ui_layer_.newPresetButton->on_click_ = [this]() {
     DBG("changed preset");
     delegate->editorChangedPreset(-1);
-    return;
     clear();
   };
 
@@ -416,22 +415,23 @@ void MainComponent::inspectorChangedParameter(int sliderIndex, float value) {
   if (isTab) {
     delegate->editorAdjustedTab(moduleIndex.column, sliderIndex, value);
   } else {
-    // auto module = delegate->getBlock(moduleIndex);
+    auto module = delegate->getBlock2(moduleIndex);
     delegate->editorAdjustedBlock(moduleIndex, sliderIndex, value);
-    // updateModuleComponentVisuals(sliderIndex, value, static_cast<std::shared_ptr<Block>>(module));
+    // auto cast = 
+    updateModuleComponentVisuals(sliderIndex, value, module);
   }
 }
 
-void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<Block> block) {
-  if (block->id.type == Model::Types::osc) {
+void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, std::shared_ptr<model::Module> module) {
+  if (module->id.type == Model::Types::osc) {
     switch (OscillatorModule::Parameters(sliderIndex)) {
     case OscillatorModule::pWave:
       changeModulePainter((int)value);
       break;
     case OscillatorModule::pUnison: {
-      auto module_component = block_matrix_[block->index.row][block->index.column];
-      if (auto painter = module_component->getPainter())
-        painter->setUnison(static_cast<int>(value));
+      // auto module_component = block_matrix_[block->index.row][block->index.column];
+      // if (auto painter = module_component->getPainter())
+      //   painter->setUnison(static_cast<int>(value));
       break;
     }
     default:
