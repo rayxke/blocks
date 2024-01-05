@@ -19,6 +19,7 @@ BlockComponent::~BlockComponent() {
 }
 
 OscillatorPainter* BlockComponent::getPainter() { return painter.get(); }
+FilterResponseComponent* BlockComponent::getFilterResponseComponent(){ return filterResponsePainter.get(); }
 
 void BlockComponent::resizePainter() {
   if (painter == nullptr) return;
@@ -139,6 +140,19 @@ void BlockComponent::remove(bool animated) {
   setTitleColour(Colours::transparentBlack);
   auto finalBounds = Rectangle<int>(getX() + getWidth() / 2, getY() + getHeight() / 2, 0, 0);
   Desktop::getInstance().getAnimator().animateComponent(this, finalBounds, 0, 75, true, 1, 1);
+}
+
+void BlockComponent::setPainter(OscillatorPainter* component) {
+  if (component == nullptr) return;
+
+  if (painter != nullptr) {
+    removeChildComponent(painter.get());
+    painter.reset();
+  }
+
+  painter = std::unique_ptr<OscillatorPainter>(component);
+  addAndMakeVisible(painter.get(), 0);
+  resizePainter();
 }
 
 void BlockComponent::setPainter(OscillatorPainter* component) {

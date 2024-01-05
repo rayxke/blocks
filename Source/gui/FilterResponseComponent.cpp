@@ -24,7 +24,7 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
 
       auto point = Point<float>(x - xOffset, mappedY + yOffset);
 
-      if (x == xOffset) {
+      if (x == xOffset) { 
           paths[i].startNewSubPath(point);
       } else {
           paths[i].lineTo(point);

@@ -13,6 +13,7 @@
 #include "gui/OutlinedLabel.h"
 #include "gui/GridItemComponent.h"
 #include "gui/OscillatorPainter.h"
+#include "gui/FilterResponseComponent.h"
 #include "gui/EasingAnimator.h"
 #include "gui/EnvelopePath.h"
 #include "model/Block.h"
@@ -42,10 +43,12 @@ public:
   ~BlockComponent() override;
 
   OscillatorPainter* getPainter();
+  FilterResponseComponent* getFilterResponseComponent();
   void setEnvelopePath(Colour colour);
   void setSelected(bool isSelected) override;
   void remove(bool animated);
   void setPainter(OscillatorPainter* component);
+  void setFilterResponse(FilterResponseComponent* component);
 
   void setTitle(String text) { this->titleLabel.setText(text, dontSendNotification); }
   void setTitleColour(Colour newColour) { this->titleLabel.setColour(Label::ColourIds::textColourId, newColour); }
@@ -64,6 +67,7 @@ private:
   Path clipRegion;
   float selectionAlpha = 0.0f;
   std::unique_ptr<OscillatorPainter> painter;
+  std::unique_ptr<FilterResponseComponent> filterResponsePainter;
   bool isPlaceholder = false;
 
   void drawStretchIndicator(Graphics& g);
