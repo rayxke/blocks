@@ -31,6 +31,16 @@ void BlockComponent::resizePainter() {
   painter->setBounds(x, y, width, height);
 }
 
+void BlockComponent::resizeFilterPainter() {
+  if (filterResponsePainter == nullptr) return;
+  float horizontalPadding = 14.0f;
+  float width = getWidth() - horizontalPadding;
+  float height = getHeight() / 2.60f;
+  float x = horizontalPadding / 2.0f;
+  float y = getHeight() / 2.0f - height / 2.0f;
+  filterResponsePainter->setBounds(x, y, width, height);
+}
+
 BlockComponent::BlockComponent(Index index): GridItemComponent({ index, Constants::moduleWidth }) {
   isSelected = false;
   isStretching = false;
@@ -155,16 +165,16 @@ void BlockComponent::setPainter(OscillatorPainter* component) {
   resizePainter();
 }
 
-void BlockComponent::setPainter(OscillatorPainter* component) {
+void BlockComponent::setFilterResponse(FilterResponseComponent* component) {
   if (component == nullptr) return;
 
-  if (painter != nullptr) {
-    removeChildComponent(painter.get());
-    painter.reset();
+  if (filterResponsePainter != nullptr) {
+    removeChildComponent(filterResponsePainter.get());
+    filterResponsePainter.reset();
   }
 
-  painter = std::unique_ptr<OscillatorPainter>(component);
-  addAndMakeVisible(painter.get(), 0);
+  filterResponsePainter = std::unique_ptr<FilterResponseComponent>(component);
+  addAndMakeVisible(filterResponsePainter.get(), 0);
   resizePainter();
 }
 
@@ -196,6 +206,14 @@ BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
     // component->getEnvelopePath()->setDecay(block->parameters[1]->audioParameter->getValue());
     // component->getEnvelopePath()->setSustain(block->parameters[2]->audioParameter->getValue());
     // component->getEnvelopePath()->setRelease(block->parameters[3]->audioParameter->getValue());
+  }
+  else if (block->id.type == Model::Types::filter) {
+    float waveformFloat = block->parameters_[0]->val->value();  
+    int waveformInt = static_cast<int>(waveformFloat);
+    auto filterResponsePainter = new FilterResponseComponent();
+    //painter->setWaveformType(static_cast<OscillatorPainter::WaveformType>(waveformInt));
+    //painter->thickness = 2.0f;
+    component->setFilterResponse(filterResponsePainter);
   }
 
   component->themeChanged(ThemeManager::shared()->getCurrent());

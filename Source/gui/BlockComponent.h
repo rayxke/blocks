@@ -75,6 +75,7 @@ private:
   void drawDisabled(Graphics& g);
   void drawOutline(Graphics& g);
   void resizePainter();
+  void resizeFilterPainter();
   void setupTitleLabel();
   void themeChanged(Theme theme) override;
   void resizeIndicators();
