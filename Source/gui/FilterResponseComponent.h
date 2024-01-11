@@ -11,11 +11,12 @@ public:
 
   void paint(juce::Graphics&) override;
   void resized() override;
-  void setUnison(int unison);
+  
 
   Colour responseColour;
   float thickness = 2.5f;
 
+  void setWaveformType();
   float cutoff = 30.0f;
   float resonance = 3.0f;
 private:

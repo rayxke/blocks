@@ -107,6 +107,7 @@ void BlockComponent::resized() {
   darkener.setBounds(getLocalBounds());
   darkener.darkener.setPath(clipRegion);
   resizePainter();
+  resizeFilterPainter();
   resizeIndicators();
 }
 
@@ -123,6 +124,9 @@ void BlockComponent::setSelected(bool isSelected) {
   setTitleColour(isSelected ? Colours::black : selectionColour);
   if (painter != nullptr) {
     painter->waveColour = isSelected ? theme.two : selectionColour;
+  }
+  if (filterResponsePainter != nullptr) {
+    filterResponsePainter->responseColour = isSelected ? theme.two : selectionColour;
   }
 }
 
@@ -175,7 +179,7 @@ void BlockComponent::setFilterResponse(FilterResponseComponent* component) {
 
   filterResponsePainter = std::unique_ptr<FilterResponseComponent>(component);
   addAndMakeVisible(filterResponsePainter.get(), 0);
-  resizePainter();
+  resizeFilterPainter();
 }
 
 void BlockComponent::setEnvelopePath(Colour colour) {
@@ -211,8 +215,8 @@ BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
     float waveformFloat = block->parameters_[0]->val->value();  
     int waveformInt = static_cast<int>(waveformFloat);
     auto filterResponsePainter = new FilterResponseComponent();
-    //painter->setWaveformType(static_cast<OscillatorPainter::WaveformType>(waveformInt));
-    //painter->thickness = 2.0f;
+    filterResponsePainter->setWaveformType();
+    filterResponsePainter->thickness = 2.0f;
     component->setFilterResponse(filterResponsePainter);
   }
 
@@ -227,6 +231,8 @@ void BlockComponent::themeChanged(Theme theme) {
 
   if (painter != nullptr)
     painter->waveColour = selectionColour;
+  if (filterResponsePainter != nullptr)
+    filterResponsePainter->responseColour = selectionColour;
 }
 
 void BlockComponent::setConfig(std::shared_ptr<model::Module> m) {
