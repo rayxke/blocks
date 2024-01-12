@@ -57,8 +57,3 @@ void FilterResponseComponent::update(const float secondsSinceLastUpdate) {
   offset += 30.0f * secondsSinceLastUpdate;
   repaint();
 }
-
-void FilterResponseComponent::setWaveformType() {
-  setFPS(60);
-  repaint();
-}

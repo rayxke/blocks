@@ -16,7 +16,6 @@ public:
   Colour responseColour;
   float thickness = 2.5f;
 
-  void setWaveformType();
   float cutoff = 30.0f;
   float resonance = 3.0f;
 private:
