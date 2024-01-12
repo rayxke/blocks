@@ -116,6 +116,7 @@ private:
   void spawnTabComponent(std::shared_ptr<Tab> tab);
   void graphicsTimerCallback(const float secondsSinceLastUpdate);
   void changeModulePainter(int value);
+  void changeModuleFilter(int value);
   PopupMenu spawnModulationMenu(Module& victim);
   void showPopupAt(ButtonGridPopup& popupWrapper, std::function<void(Index)> callback);
   void updateInspectorModulationIndicators();

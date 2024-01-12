@@ -78,6 +78,10 @@ void MainComponent::changeModulePainter(int value) {
   auto cast_block = static_cast<BlockComponent*>(focused_grid_item_);
   cast_block->getPainter()->setWaveformType(static_cast<OscillatorPainter::WaveformType>(value));
 }
+void MainComponent::changeModuleFilter(int value) {
+  auto cast_block = static_cast<BlockComponent*>(focused_grid_item_);
+  cast_block->getFilterResponseComponent()->setFilterType(static_cast<FilterResponseComponent::WaveformType>(value));
+}
 
 MainComponent::~MainComponent() {
   setLookAndFeel(nullptr);
@@ -438,6 +442,9 @@ void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, s
       break;
     }
   }
+  if (module->id.type == Model::Types::filter){
+    changeModuleFilter((int)value);
+  } 
 }
 
 void MainComponent::refreshInspector() {

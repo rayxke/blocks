@@ -28,7 +28,6 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
   //g.drawRect(getBounds().getX() - 5 , getBounds().getY() - 10, getWidth() - 10, getHeight());
   g.drawText(filtermodel, mywindow,juce::Justification::centredRight, true);
   //g.drawText(filtermodel, mywindow,juce::Justification::centredRight, true);
-  int i = 10;
 
   /*for (int i = 0; i < 4; i++) {
       float xOffset = i * 3.0f;
@@ -67,6 +66,7 @@ void FilterResponseComponent::update(const float secondsSinceLastUpdate) {
   repaint();
 }
 
-void FilterResponseComponent::setfiltername(std::string filtername){
-  filtermodel = filtername;
+void FilterResponseComponent::setFilterType(std::string filtername){
+  if (this->filtermodel == filtername) return;
+  this->filtermodel = filtername;
 }

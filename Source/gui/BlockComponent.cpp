@@ -212,7 +212,7 @@ BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
     // component->getEnvelopePath()->setRelease(block->parameters[3]->audioParameter->getValue());
   } else if (block->id.type == Model::Types::filter) { 
     auto filterResponsePainter = new FilterResponseComponent();
-    filterResponsePainter->filtermodel =  block->parameters_[0]->string_lookup[0];
+    filterResponsePainter->setFilterType(block->parameters_[0]->string_lookup[0]);
     filterResponsePainter->cutoff      =  block->parameters_[2]->val->value();
     filterResponsePainter->resonance   =  block->parameters_[3]->val->value();
     filterResponsePainter->thickness   =  2.0f;

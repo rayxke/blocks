@@ -15,14 +15,14 @@ public:
 
   Colour responseColour;
   float thickness = 2.5f;
-  std::string filtermodel;
-  void setfiltername(std::string);
+  void setFilterType(std::string);
   float cutoff = 30.0f;
   float resonance = 3.0f;
 private:
   float resolution = 0.5f;
   Path paths[4];
   float offset = 0;
+  std::string filtermodel;
 
   void update(const float secondsSinceLastUpdate) override;
 
