@@ -15,7 +15,8 @@ public:
 
   Colour responseColour;
   float thickness = 2.5f;
-
+  std::string filtermodel;
+  void setfiltername(std::string);
   float cutoff = 30.0f;
   float resonance = 3.0f;
 private:

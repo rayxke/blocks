@@ -7,8 +7,8 @@
 FilterResponseComponent::FilterResponseComponent(): responseColour(Colours::white.withAlpha(0.9f)) {
   setInterceptsMouseClicks(false, false);
   start();
-  for (int i = 0; i < 4; i++)
-    paths[i] = Path();
+  //for (int i = 0; i < 4; i++)
+  //  paths[i] = Path();
 }
 
 FilterResponseComponent::~FilterResponseComponent() { }
@@ -16,12 +16,21 @@ FilterResponseComponent::~FilterResponseComponent() { }
 void FilterResponseComponent::resized() {}
 
 void FilterResponseComponent::paint(juce::Graphics& g) {
-  int componentCenterY = getHeight() / 2;
+  int componentCenterY = getHeight() / 4;
   int componentCenterX = getWidth() / 2;
   //g.setColour(responseColour.withAlpha(alpha));
   //g.drawRect(componentCenterX, componentCenterY, getHeight()*2, getWidth()*2);
+  Rectangle<int> mywindow = getBounds().removeFromRight(getWidth()/3);
+  mywindow.setTop(getBounds().getY() -20);
 
-  for (int i = 0; i < 4; i++) {
+  g.setColour(juce::Colours::blue);
+  //int halfHeight = getHeight() / 2.0f - thickness;
+  //g.drawRect(getBounds().getX() - 5 , getBounds().getY() - 10, getWidth() - 10, getHeight());
+  g.drawText(filtermodel, mywindow,juce::Justification::centredRight, true);
+  //g.drawText(filtermodel, mywindow,juce::Justification::centredRight, true);
+  int i = 10;
+
+  /*for (int i = 0; i < 4; i++) {
       float xOffset = i * 3.0f;
       float yOffset = i * 1.5f;
 
@@ -41,7 +50,7 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
       } else {
           paths[i].lineTo(point);
       }
-     }  
+     } 
   }
 
   for (int i = 1-1; i >= 0; i--) {
@@ -49,11 +58,15 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
     g.setColour(responseColour.withAlpha(0.9f));
     g.strokePath(paths[i], PathStrokeType(thickness));
     paths[i].clear();
-  }
+  }*/
 }
 
 
 void FilterResponseComponent::update(const float secondsSinceLastUpdate) {
   offset += 30.0f * secondsSinceLastUpdate;
   repaint();
+}
+
+void FilterResponseComponent::setfiltername(std::string filtername){
+  filtermodel = filtername;
 }

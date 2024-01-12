@@ -210,11 +210,12 @@ BlockComponent* BlockComponent::create(std::shared_ptr<model::Block> block) {
     // component->getEnvelopePath()->setDecay(block->parameters[1]->audioParameter->getValue());
     // component->getEnvelopePath()->setSustain(block->parameters[2]->audioParameter->getValue());
     // component->getEnvelopePath()->setRelease(block->parameters[3]->audioParameter->getValue());
-  } else if (block->id.type == Model::Types::filter) {
-    int cutoff =  block->parameters_[2]->val->value();
-    int resonance =  block->parameters_[3]->val->value();
+  } else if (block->id.type == Model::Types::filter) { 
     auto filterResponsePainter = new FilterResponseComponent();
-    filterResponsePainter->thickness = 2.0f;
+    filterResponsePainter->filtermodel =  block->parameters_[0]->string_lookup[0];
+    filterResponsePainter->cutoff      =  block->parameters_[2]->val->value();
+    filterResponsePainter->resonance   =  block->parameters_[3]->val->value();
+    filterResponsePainter->thickness   =  2.0f;
     component->setFilterResponse(filterResponsePainter);
   }
 
