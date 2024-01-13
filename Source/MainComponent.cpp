@@ -443,7 +443,13 @@ void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, s
     }
   }
   if (module->id.type == Model::Types::filter){
-    changeModuleFilter((int)value);
+    switch (FilterModule::Parameters(sliderIndex)) {
+    case FilterModule::pType:
+      changeModuleFilter((int)value);
+      break;
+    default:
+      break;
+    }
   } 
 }
 

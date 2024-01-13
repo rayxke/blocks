@@ -23,9 +23,12 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
   Rectangle<int> mywindow = getBounds().removeFromRight(getWidth()/3);
   mywindow.setTop(getBounds().getY() -20);
 
-  g.setColour(juce::Colours::blue);
+  //g.setColour(juce::Colours::blue);
   //int halfHeight = getHeight() / 2.0f - thickness;
   //g.drawRect(getBounds().getX() - 5 , getBounds().getY() - 10, getWidth() - 10, getHeight());
+  
+  //float alpha = std::lerp(1.0f, 0.01f, 1.0f);
+  g.setColour(responseColour.withAlpha(0.9f));
   g.drawText(filtermodel, mywindow,juce::Justification::centredRight, true);
   //g.drawText(filtermodel, mywindow,juce::Justification::centredRight, true);
 
