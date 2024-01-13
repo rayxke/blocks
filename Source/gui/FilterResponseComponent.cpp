@@ -66,7 +66,35 @@ void FilterResponseComponent::update(const float secondsSinceLastUpdate) {
   repaint();
 }
 
-void FilterResponseComponent::setFilterType(std::string filtername){
-  if (this->filtermodel == filtername) return;
-  this->filtermodel = filtername;
+void FilterResponseComponent::setFilterType(int filtertype){
+  switch(filtertype)
+  {
+    case 0:
+      filtermodel = "analog";
+      break;
+    case 1:
+      filtermodel = "dirty";
+      break;
+    case 2:
+      filtermodel = "ladder";
+      break;
+    case 3:
+      filtermodel = "digital";
+      break;
+    case 4:
+      filtermodel = "diode";
+      break;
+    case 5:
+      filtermodel = "formant";
+      break;
+    case 6:
+      filtermodel = "comb";
+      break;
+    case 7:
+      filtermodel = "phaser";
+      break;
+    default:
+      break;
+
+  }
 }

@@ -80,7 +80,7 @@ void MainComponent::changeModulePainter(int value) {
 }
 void MainComponent::changeModuleFilter(int value) {
   auto cast_block = static_cast<BlockComponent*>(focused_grid_item_);
-  cast_block->getFilterResponseComponent()->setFilterType(static_cast<FilterResponseComponent::WaveformType>(value));
+  cast_block->getFilterResponseComponent()->setFilterType(value);
 }
 
 MainComponent::~MainComponent() {
