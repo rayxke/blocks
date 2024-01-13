@@ -16,12 +16,12 @@ FilterResponseComponent::~FilterResponseComponent() { }
 void FilterResponseComponent::resized() {}
 
 void FilterResponseComponent::paint(juce::Graphics& g) {
-  int componentCenterY = getHeight() / 4;
+  int componentCenterY = getHeight() / 2;
   int componentCenterX = getWidth() / 2;
   //g.setColour(responseColour.withAlpha(alpha));
   //g.drawRect(componentCenterX, componentCenterY, getHeight()*2, getWidth()*2);
   Rectangle<int> mywindow = getBounds().removeFromRight(getWidth()/3);
-  mywindow.setTop(getBounds().getY() -20);
+  //mywindow.setTop(getBounds().getY() -20);
 
   //g.setColour(juce::Colours::blue);
   //int halfHeight = getHeight() / 2.0f - thickness;
@@ -29,7 +29,9 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
   
   //float alpha = std::lerp(1.0f, 0.01f, 1.0f);
   g.setColour(responseColour.withAlpha(0.9f));
-  g.drawText(filtermodel, mywindow,juce::Justification::centredRight, true);
+  g.drawRect(getBounds().getX(), getBounds().getY() - getHeight() -10, getWidth() - 10, getHeight());
+  //g.setFont(3.0f);
+  //g.drawMultiLineText(filtermodel, mywindow.getX(), mywindow.getY(),1,juce::Justification::left);
   //g.drawText(filtermodel, mywindow,juce::Justification::centredRight, true);
 
   /*for (int i = 0; i < 4; i++) {
