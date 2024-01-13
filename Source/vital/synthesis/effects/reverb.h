@@ -58,11 +58,12 @@ public:
     kSize,
     kDelay,
     kWet,
+    kReset,
     kNumInputs
   };
 
   Reverb();
-  virtual ~Reverb() = default;
+  virtual ~Reverb() { }
 
   void process(int num_samples) override;
   void processWithInput(const poly_float* audio_in, int num_samples) override;
@@ -78,6 +79,7 @@ public:
   void setOversampleAmount(int oversample_amount) override;
   void setupBuffersForSampleRate(int sample_rate);
   void hardReset() override;
+  void reset(poly_mask mask) override;
 
   force_inline poly_float readFeedback(const mono_float* const* lookups, poly_float offset) {
     poly_float write_offset = poly_float(write_index_) - offset;
@@ -102,15 +104,15 @@ public:
     buffer[max_feedback_size_ + 3] = buffer[3];
   }
 
-  virtual Processor* clone() const override { VITAL_ASSERT(false); return nullptr; }
-
-private:
-  std::unique_ptr<StereoMemory> memory_;
-
-  std::unique_ptr<poly_float[]> allpass_lookups_[kNetworkContainers];
-  std::unique_ptr<mono_float[]> feedback_memories_[kNetworkSize];
-  mono_float* feedback_lookups_[kNetworkSize];
+  virtual Processor* clone() const override;
+  StereoMemory* memory_;
   poly_float decays_[kNetworkContainers];
+  poly_float* allpass_lookups_[kNetworkContainers];
+  mono_float* feedback_memories_[kNetworkSize];
+  mono_float* feedback_lookups_[kNetworkSize];
+  int max_feedback_size_;
+private:
+
 
   OnePoleFilter<> low_shelf_filters_[kNetworkContainers];
   OnePoleFilter<> high_shelf_filters_[kNetworkContainers];
@@ -136,12 +138,12 @@ private:
   int write_index_;
 
   int max_allpass_size_;
-  int max_feedback_size_;
   int feedback_mask_;
   poly_mask allpass_mask_;
   int poly_allpass_mask_;
 
+  // void reset(poly_mask mask) override;
+
   JUCE_LEAK_DETECTOR(Reverb)
 };
 } // namespace vital
-

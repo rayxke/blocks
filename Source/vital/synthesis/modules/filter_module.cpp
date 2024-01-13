@@ -235,8 +235,9 @@ void FilterModule::process(int num_samples) {
       current_mix += delta_mix;
       audio_out[i] = utils::interpolate(audio_in[i], audio_out[i], current_mix);
     }
-  } else
+  } else {
     utils::zeroBuffer(output()->buffer, num_samples);
+  }
 }
 
 void FilterModule::setMono(bool mono) {

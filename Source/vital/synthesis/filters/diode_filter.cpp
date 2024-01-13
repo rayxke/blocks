@@ -21,6 +21,7 @@
 namespace vital {
 DiodeFilter::DiodeFilter(): Processor(DiodeFilter::kNumInputs, 1) {
   hardReset();
+  // DBG("DiodeFilter::DiodeFilter");
 }
 
 void DiodeFilter::reset(poly_mask reset_mask) {
@@ -53,6 +54,7 @@ void DiodeFilter::process(int num_samples) {
 
   poly_mask reset_mask = getResetMask(kReset);
   if (reset_mask.anyMask()) {
+    utils::print_mask(reset_mask, "DiodeFilter::process reset_mask", this);
     reset(reset_mask);
 
     current_resonance = utils::maskLoad(current_resonance, resonance_, reset_mask);
@@ -89,8 +91,7 @@ void DiodeFilter::process(int num_samples) {
     current_high_pass_ratio += delta_high_pass_ratio;
     current_high_pass_amount += delta_high_pass_amount;
 
-    tick(audio_in[i], coefficient, current_high_pass_ratio, current_high_pass_amount,
-      high_pass_feedback_coefficient, current_resonance, current_drive);
+    tick(audio_in[i], coefficient, current_high_pass_ratio, current_high_pass_amount, high_pass_feedback_coefficient, current_resonance, current_drive);
     audio_out[i] = stage4_.getCurrentState() * current_post_multiply;
   }
 }
@@ -117,10 +118,7 @@ void DiodeFilter::setupFilter(const FilterState& filter_state) {
   }
 }
 
-force_inline void DiodeFilter::tick(poly_float audio_in, poly_float coefficient,
-  poly_float high_pass_ratio, poly_float high_pass_amount,
-  poly_float high_pass_feedback_coefficient,
-  poly_float resonance, poly_float drive) {
+force_inline void DiodeFilter::tick(poly_float audio_in, poly_float coefficient, poly_float high_pass_ratio, poly_float high_pass_amount, poly_float high_pass_feedback_coefficient, poly_float resonance, poly_float drive) {
   poly_float high_pass_coefficient = coefficient * high_pass_ratio;
   poly_float high_pass_coefficient2 = high_pass_coefficient * 2.0f;
   poly_float high_pass_coefficient_squared = high_pass_coefficient * high_pass_coefficient;

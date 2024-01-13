@@ -34,6 +34,7 @@
 #include "lfo_module_new.h"
 #include "blocks_voice_handler.h"
 #include "vital/synthesis/modules/reverb_module.h"
+#include "vital/synthesis/modules/delay_module.h"
 
 namespace vital {
 
@@ -102,13 +103,16 @@ void BlocksVoiceHandler::removeBlock(Index index, std::shared_ptr<model::Block> 
 
   unplugAll();
   auto processor = processor_matrix_[index.column][index.row];
-  processor->control_map_["on"]->set(0.0f);
-  if (block->id.type == "osc") {
-  } else if (block->id.type == "filter") {
+
+  if (processor->control_map_.count("on"))
+    processor->control_map_["on"]->set(0.0f);
+
+  // if (block->id.type == "osc") {
+  // } else if (block->id.type == "filter") {
     // auto filter = std::static_pointer_cast<FilterModule>(processor);
     // filter->control_map_["on"]->set(0.0f); 
     // processors_["filter"].push_back(filter);
-  }
+  // }
 
   processor_pool_[block->id.type].push_back(processor);
   processor_matrix_[index.column][index.row] = nullptr;
@@ -174,6 +178,7 @@ void BlocksVoiceHandler::init() {
   createNoteArticulation();
   createOscillators();
   createReverbs();
+  createDelays();
   createModulators();
   createFilters(note_from_reference_->output());
   createVoiceOutput();
@@ -275,8 +280,20 @@ void BlocksVoiceHandler::createReverbs() {
     auto reverb = std::make_shared<ReverbModule>();
     addSubmodule(reverb.get());
     addProcessor(reverb.get());
+    reverb->plug(reset(), ReverbModule::kReset);
     reverb->enable(false);
     processor_pool_["reverb"].push_back(reverb);
+  }
+}
+
+void BlocksVoiceHandler::createDelays() {
+  for (int i = 0; i < 5; i++) {
+    auto delay = std::make_shared<DelayModule>(beats_per_second_);
+    delay->plug(reset(), DelayModule::kReset);
+    addSubmodule(delay.get());
+    addProcessor(delay.get());
+    delay->enable(false);
+    processor_pool_["delay"].push_back(delay);
   }
 }
 
@@ -300,9 +317,22 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
     module->parameters_[2]->val = processor->control_map_["cutoff"];
     module->parameters_[3]->val = processor->control_map_["resonance"];
     module->parameters_[4]->val = processor->control_map_["blend"];
+    module->parameters_[5]->val = processor->control_map_["mix"];
     processor->control_map_["on"]->set(1.0f);
   } else if (module->id.type == "reverb") {
-    processor->enable(true);
+    module->parameter_map_["chorus_frequency"]->val = processor->control_map_["reverb_chorus_frequency"];
+    module->parameter_map_["decay_time"]->val = processor->control_map_["reverb_decay_time"];
+    module->parameter_map_["dry_wet"]->val = processor->control_map_["dry_wet"];
+    module->parameter_map_["high_shelf_cutoff"]->val = processor->control_map_["reverb_high_shelf_cutoff"];
+    module->parameter_map_["high_shelf_gain"]->val = processor->control_map_["reverb_high_shelf_gain"];
+    module->parameter_map_["low_shelf_cutoff"]->val = processor->control_map_["reverb_low_shelf_cutoff"];
+    module->parameter_map_["low_shelf_gain"]->val = processor->control_map_["reverb_low_shelf_gain"];
+    module->parameter_map_["pre_high_cutoff"]->val = processor->control_map_["reverb_pre_high_cutoff"];
+    module->parameter_map_["pre_low_cutoff"]->val = processor->control_map_["reverb_pre_low_cutoff"];
+    module->parameter_map_["size"]->val = processor->control_map_["reverb_size"];
+    module->parameter_map_["delay"]->val = processor->control_map_["reverb_delay"];
+  } else if (module->id.type == "delay") {
+
   }
 
   auto index = module->index;
@@ -310,7 +340,7 @@ std::shared_ptr<SynthModule> BlocksVoiceHandler::createProcessor(std::shared_ptr
   active_processor_map_[module->name] = processor;
   active_processors_.push_back(processor);
   // processors_[module->id.type].push_back(processor);
-  processor->setModule(module); 
+  processor->setModule(module);
   return processor;
 }
 
@@ -331,9 +361,9 @@ void BlocksVoiceHandler::createOscillators() {
   }
 }
 
-void BlocksVoiceHandler::clear() { 
+void BlocksVoiceHandler::clear() {
   for (auto processor : active_processors_) {
-    processor_pool_[processor->module_->id.type].push_back(processor); 
+    processor_pool_[processor->module_->id.type].push_back(processor);
     processor->enable(false);
   }
 
@@ -603,7 +633,7 @@ void BlocksVoiceHandler::setOSCAmplitudeEnvelope(std::shared_ptr<model::Module> 
   // osc->amplitude_envelope_->followModule(adsr);
 }
 
-void BlocksVoiceHandler::resetOSCAmplitudeEnvelope(std::shared_ptr<model::Module> target) { 
+void BlocksVoiceHandler::resetOSCAmplitudeEnvelope(std::shared_ptr<model::Module> target) {
   auto osc = dynamic_cast<OscillatorModule*>(active_processor_map_[target->name].get());
   osc->resetAmpADSR();
 }

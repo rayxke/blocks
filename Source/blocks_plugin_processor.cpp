@@ -20,6 +20,7 @@
 #include "vital/synthesis/synth_engine/sound_engine.h"
 #include "vital/common/load_save.h"
 #include "vital/synthesis/modules/blocks_voice_handler.h"
+#include "playground.h"
 
 PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)), SynthGuiInterface(this, false) {
   // for (auto module : synth.moduleManager.pool.allModules) {
@@ -28,6 +29,8 @@ PluginProcessor::PluginProcessor(): juce::AudioProcessor(BusesProperties().withO
   //     parameter->audioParameter->addListener(this);
   //   }
   // }
+
+  // please(); exit(1);
 
   last_seconds_time_ = 0.0;
 
