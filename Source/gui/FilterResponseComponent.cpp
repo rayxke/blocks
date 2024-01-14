@@ -26,10 +26,12 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
   //g.drawLine(0, componentCenterY+halfHeight, mypos.getX() + getWidth(), componentCenterY+halfHeight);
   //g.drawLine(0, componentCenterY, mypos.getX() + getWidth(), componentCenterY);
   //g.drawLine(0, componentCenterY-halfHeight, mypos.getX() + getWidth(), componentCenterY-halfHeight);
+  auto scaledCutoff = (cutoff-60.0f)/10.0f;
   for (float x = 0; x < getWidth(); x += resolution) {
-        if (x <= componentCenterX + (cutoff/10.0f) ){
+        float cutoffPoint = (float) componentCenterX + scaledCutoff;
+        if (x <= cutoffPoint){
           float y = componentCenterY - halfHeight;
-          if (x == componentCenterX + (cutoff/10.0f) ) {
+          if (abs(x - cutoffPoint) < resolution) {
             y = componentCenterY + halfHeight;
           }
           auto point = Point<float>(x, y);
