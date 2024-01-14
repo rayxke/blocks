@@ -20,7 +20,7 @@ public:
   float resonance = 3.0f;
 private:
   float resolution = 0.5f;
-  Path paths[4];
+  Path responsePath;
   float offset = 0;
   std::string filtermodel;
 

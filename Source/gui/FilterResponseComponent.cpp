@@ -7,8 +7,6 @@
 FilterResponseComponent::FilterResponseComponent(): responseColour(Colours::white.withAlpha(0.9f)) {
   setInterceptsMouseClicks(false, false);
   start();
-  //for (int i = 0; i < 4; i++)
-  //  paths[i] = Path();
 }
 
 FilterResponseComponent::~FilterResponseComponent() { }
@@ -18,9 +16,39 @@ void FilterResponseComponent::resized() {}
 void FilterResponseComponent::paint(juce::Graphics& g) {
   int componentCenterY = getHeight() / 2;
   int componentCenterX = getWidth() / 2;
+  float halfHeight = getHeight() / 2.0f - thickness;
   //g.setColour(responseColour.withAlpha(alpha));
   //g.drawRect(componentCenterX, componentCenterY, getHeight()*2, getWidth()*2);
-  Rectangle<int> mywindow = getBounds().removeFromRight(getWidth()/3);
+  Rectangle<int> mywindow = getBounds().removeFromLeft(getWidth()/3);
+  g.setColour(juce::Colours::green);
+  //auto mypos = getBounds().getPosition();
+  //g.drawLine(componentCenterX, componentCenterY+halfHeight, componentCenterX, componentCenterY-halfHeight);
+  //g.drawLine(0, componentCenterY+halfHeight, mypos.getX() + getWidth(), componentCenterY+halfHeight);
+  //g.drawLine(0, componentCenterY, mypos.getX() + getWidth(), componentCenterY);
+  //g.drawLine(0, componentCenterY-halfHeight, mypos.getX() + getWidth(), componentCenterY-halfHeight);
+  for (float x = 0; x < getWidth(); x += resolution) {
+        if (x <= componentCenterX + (cutoff/10.0f) ){
+          float y = componentCenterY - halfHeight;
+          if (x == componentCenterX + (cutoff/10.0f) ) {
+            y = componentCenterY + halfHeight;
+          }
+          auto point = Point<float>(x, y);
+          if (x == 0){
+            responsePath.startNewSubPath(point);
+          } else{
+            responsePath.lineTo(point);
+          }
+        }
+        
+  }
+  g.strokePath(responsePath, PathStrokeType(thickness));
+  responsePath.clear();
+  //g.drawRect(mypos.getX(), mypos.getY(), getWidth()*2, getHeight()*2);
+  //getBounds().setTop(getBounds().getY() - getBounds().getHeight());
+  //g.drawRect(getBounds());
+  //g.fillEllipse(mywindow.toFloat());
+  //g.setColour(responseColour.withAlpha(0.9f));
+  //g.drawEllipse(mywindow.toFloat(), 1.0f);
   //mywindow.setTop(getBounds().getY() -20);
 
   //g.setColour(juce::Colours::blue);
@@ -28,8 +56,8 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
   //g.drawRect(getBounds().getX() - 5 , getBounds().getY() - 10, getWidth() - 10, getHeight());
   
   //float alpha = std::lerp(1.0f, 0.01f, 1.0f);
-  g.setColour(responseColour.withAlpha(0.9f));
-  g.drawRect(getBounds().getX(), getBounds().getY() - getHeight() -10, getWidth() - 10, getHeight());
+  //g.setColour(responseColour.withAlpha(0.9f));
+  //g.drawRect(getBounds().getX(), getBounds().getY() - getHeight() -10, getWidth() - 10, getHeight());
   //g.setFont(3.0f);
   //g.drawMultiLineText(filtermodel, mywindow.getX(), mywindow.getY(),1,juce::Justification::left);
   //g.drawText(filtermodel, mywindow,juce::Justification::centredRight, true);
