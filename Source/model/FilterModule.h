@@ -16,7 +16,7 @@
 
 namespace Model {
 struct FilterModule: public Block {
-  enum Parameters { pType, pStyle, pFrequency, pQ, pBlend, pMix };
+  enum Parameters { pModel, pStyle, pCutoff, pQ, pBlend, pMix };
   ~FilterModule() {}
 
   FilterModule(int number): Block(Types::filter, number) {
