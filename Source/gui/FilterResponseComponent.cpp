@@ -16,14 +16,12 @@ void FilterResponseComponent::resized() {}
 void FilterResponseComponent::paint(juce::Graphics& g) {
   int componentCenterY = getHeight() / 2;
   int componentCenterX = getWidth() / 2;
+  float halfWidth = getWidth() / 2.0f - thickness;
   float halfHeight = getHeight() / 2.0f - thickness;
-  Rectangle<int> mywindow = getBounds().removeFromLeft(getWidth()/3);
-  g.setColour(juce::Colours::green);
-  auto offset = 60.0f;
-  auto scaledCutoff = (cutoff-offset)/10.0f;
+  float scaledCutoff = jmap(cutoff, 8.0f, 136.0f, -halfWidth, halfWidth);
   for (float x = 0; x < getWidth(); x += resolution) {
         float cutoffPoint = (float) componentCenterX + scaledCutoff;
-        float y = componentCenterY - halfHeight;
+        float y = componentCenterY;
         auto point = Point<float>(x, y);
         if (x == 0){
             responsePath.startNewSubPath(point);
@@ -34,6 +32,7 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
           responsePath.lineTo(point);
         }     
   }
+  g.setColour(juce::Colours::green);
   g.strokePath(responsePath, PathStrokeType(thickness));
   responsePath.clear();
 }
