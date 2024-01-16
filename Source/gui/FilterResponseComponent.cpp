@@ -21,16 +21,20 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
   float scaledCutoff = jmap(cutoff, 8.0f, 136.0f, -halfWidth, halfWidth);
   for (float x = 0; x < getWidth(); x += resolution) {
         float cutoffPoint = (float) componentCenterX + scaledCutoff;
+        float cutoffRatio = x / cutoffPoint;
         float y = componentCenterY;
         auto point = Point<float>(x, y);
         if (x == 0){
             responsePath.startNewSubPath(point);
-        } else if (x <= cutoffPoint){
-          if (abs(x - cutoffPoint) < resolution) {
-            point.setY(componentCenterY + halfHeight);
+            continue;
+        } 
+        if (x >= cutoffPoint){
+          point.setY(componentCenterY + (halfHeight * cutoffRatio));
+          if ((x-cutoffPoint) < resolution){
+            point.setY(componentCenterY + (halfHeight * cutoffRatio * -q)) ;
           }
-          responsePath.lineTo(point);
-        }     
+        }  
+        responsePath.lineTo(point);   
   }
   g.setColour(juce::Colours::green);
   g.strokePath(responsePath, PathStrokeType(thickness));
