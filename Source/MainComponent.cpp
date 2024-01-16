@@ -445,13 +445,13 @@ void MainComponent::updateModuleComponentVisuals(int sliderIndex, float value, s
   if (module->id.type == Model::Types::filter){
     auto cast_block = static_cast<BlockComponent*>(focused_grid_item_);
     switch (FilterModule::Parameters(sliderIndex)) {
-    case FilterModule::pModel:
+    case FilterModule::pType:
       changeModuleFilter((int)value);
       break;
     case FilterModule::pStyle:
       cast_block->getFilterResponseComponent()->filterStyle = (FilterResponseComponent::FilterStyle) value;
       break;
-    case FilterModule::pCutoff:
+    case FilterModule::pFrequency:
       cast_block->getFilterResponseComponent()->cutoff = value; 
       break;
     case FilterModule::pQ:
