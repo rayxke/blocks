@@ -29,7 +29,7 @@ void FilterResponseComponent::paint(juce::Graphics& g) {
             continue;
         } 
         if (x >= cutoffPoint){
-          point.setY(componentCenterY + (halfHeight * cutoffRatio));
+          point.setY(componentCenterY + (halfHeight));
           if ((x-cutoffPoint) < resolution){
             point.setY(componentCenterY + (halfHeight * cutoffRatio * -q)) ;
           }
